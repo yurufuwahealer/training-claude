@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConnectionCheckController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -12,5 +13,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::inertia('/hello', 'Hello')->name('hello');
+
+Route::get('/connection-check', ConnectionCheckController::class)->name('connection-check');
+
 
 require __DIR__.'/settings.php';
