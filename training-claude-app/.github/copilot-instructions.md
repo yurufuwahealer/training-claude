@@ -1,13 +1,7 @@
-# CLAUDE.md（training-claude-app）
+# GitHub Copilot 向けコンテキスト（training-claude-app）
 
-Laravel アプリのコーディングルール・開発環境・規約を定義します。
-
----
-
-## プロジェクト概要
-
-Claude Code を極めるための学習・実験用アプリ。
-Laravel + Inertia.js + React + TypeScript による SPA 構成。
+Laravel + Inertia.js + React + TypeScript による SPA アプリ。
+Claude Code を極めるための学習・実験用プロジェクト。
 
 ---
 
@@ -28,63 +22,65 @@ Laravel + Inertia.js + React + TypeScript による SPA 構成。
 
 ## 開発環境
 
-### 前提条件
-
-- Docker が起動していること
-- PHP・Node.js・Composer はローカル不要（すべて `sail` 経由で実行）
-
-### 起動手順
-
-```bash
-# training-claude-app/ ディレクトリで実行
-sail up -d
-sail npm run dev   # 別ターミナルで実行（フロント開発サーバー）
-```
+- PHP・Node.js・Composer はローカルにインストールされていない
+- すべてのコマンドは `sail` 経由で実行する（`php`・`composer`・`npm` を直接使わない）
+- 実行前に Docker が起動していること
 
 ---
 
 ## よく使うコマンド
 
-すべて `training-claude-app/` ディレクトリで実行すること。
-
-| コマンド | 説明 |
-|---------|------|
-| `sail up -d` | コンテナ起動 |
-| `sail down` | コンテナ停止 |
-| `sail npm run dev` | フロント開発サーバー起動（別ターミナル） |
-| `sail npm run build` | フロントビルド |
-| `sail vendor/bin/pest` | テスト実行 |
-| `sail composer lint` | PHP フォーマット（Pint） |
-| `sail npm run lint:check` | JS/TS Lint チェック |
-| `sail npm run lint` | JS/TS Lint 自動修正 |
-| `sail npm run format` | Prettier フォーマット |
-| `sail npm run types:check` | TypeScript 型チェック |
-| `sail artisan migrate` | マイグレーション実行 |
-| `sail artisan {コマンド}` | Artisan コマンド全般 |
-| `sail composer {コマンド}` | Composer コマンド全般 |
+```bash
+sail up -d                    # コンテナ起動
+sail down                     # コンテナ停止
+sail npm run dev              # フロント開発サーバー（別ターミナル）
+sail npm run build            # フロントビルド
+sail vendor/bin/pest          # テスト実行
+sail composer lint            # PHP フォーマット（Pint）
+sail npm run lint:check       # JS/TS Lint チェック
+sail npm run lint             # JS/TS Lint 自動修正
+sail npm run format           # Prettier フォーマット
+sail npm run types:check      # TypeScript 型チェック
+sail artisan migrate          # マイグレーション実行
+```
 
 ---
 
 ## コーディング規約
 
-規約ファイルを必ず参照すること（内容はここに転記しない）：
+規約の詳細は以下のファイルを参照すること：
 
 - `pint.json` — PHP フォーマット規約（Laravel Pint）
 - `eslint.config.js` — JavaScript / TypeScript 規約
 - `.prettierrc` — フロントエンドフォーマット規約
 - `.editorconfig` — インデント・改行コード設定
 
-### Controller
+### Controller のルール
 
 - 1つの Controller には1つのメソッドのみ定義する（シングルアクション Controller）
 - メソッド名は `__invoke` を使う
 - クラスやファサードの参照は絶対パスではなく、必ず `use` 宣言を使う
 
+```php
+// Good
+use Illuminate\Http\Request;
+
+class ShowUserController
+{
+    public function __invoke(Request $request) {}
+}
+
+// Bad
+class UserController
+{
+    public function index(\Illuminate\Http\Request $request) {}
+    public function show(\Illuminate\Http\Request $request) {}
+}
+```
+
 ---
 
 ## コミットメッセージ
-
-フォーマット：
 
 ```
 {ブランチ名} {タイトル}
@@ -124,11 +120,11 @@ TASK-123 ユーザー認証機能を追加
 
 ## テスト方針
 
-TDD（テスト駆動開発）を採用。実装と同時にテストを書く。
+TDD（テスト駆動開発）を採用。**実装と同時にテストを書く**。
 
-- テストファイルは `tests/` ディレクトリに配置
 - テストフレームワーク：Pest
-- 実行コマンド：`sail vendor/bin/pest`
+- テストファイル：`tests/` ディレクトリ
+- 実行：`sail vendor/bin/pest`
 
 ---
 
@@ -155,19 +151,3 @@ training-claude-app/
 ├── tests/               # Pest テスト
 └── compose.yaml         # Docker Compose（Sail）
 ```
-
----
-
-## 環境変数
-
-`.env.example` を参照すること。機密値は `.env` に記載し、リポジトリにコミットしない。
-
-主な設定項目：
-
-| 変数 | 説明 |
-|------|------|
-| `APP_NAME` | アプリケーション名 |
-| `APP_ENV` | 実行環境（local / production） |
-| `APP_KEY` | アプリケーションキー（`sail artisan key:generate` で生成） |
-| `DB_CONNECTION` | DB 接続方式（sqlite / mysql） |
-| `DB_DATABASE` | DB 名 |
